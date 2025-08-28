@@ -1,0 +1,35 @@
+# Byte-compiled / optimized / compiled files
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Editor-specific files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+.DS_Store # macOS specific
+
+# Miscellaneous
+*.tmp
+*.bak
+*.sqlite3 # Database files (if not intended for version control)
+.ipynb_checkpoints/ # Jupyter Notebook checkpoints
+profile_default/ # IPython profiles
+ipython_config.py # IPython config
+celerybeat-schedule # Celery beat schedule file
+/site # mkdocs documentation build output
+.mypy_cache/ # mypy cache
+.dmypy.json
+dmypy.json
