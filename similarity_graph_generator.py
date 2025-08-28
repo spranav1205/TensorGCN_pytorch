@@ -82,6 +82,23 @@ def subset_similarity(indices, name):
     print(f"✅ Saved {name} similarity matrix: {out_path}, shape={sim_matrix.shape}")
     return sim_matrix
 
+def full_similarity(name, corp):
+    embeddings = sbert_model.encode(
+        corp,
+        convert_to_tensor=True,
+        device=DEVICE,
+        show_progress_bar=True
+    )
+    sim_matrix = cosine_similarity(embeddings.cpu().numpy())
+
+    out_path = os.path.join(DATA_DIR, f"{DATASET}.{name}.full.modularity_adj")
+    with open(out_path, 'wb') as f:
+        np.save(f, sim_matrix)
+    print(f"✅ Saved {name} similarity matrix: {out_path}, shape={sim_matrix.shape}")
+    return sim_matrix
+
 # ---------------- GENERATE MATRICES ----------------
-sim_train = subset_similarity(train_idx, "train")
-sim_test  = subset_similarity(test_idx, "test")
+# sim_train = subset_similarity(train_idx, "train")
+# sim_test  = subset_similarity(test_idx, "test")
+
+full = full_similarity("full", corpus)
