@@ -17,7 +17,7 @@ def sample_mask(idx, l):
     """Create mask."""
     mask = np.zeros(l)
     mask[idx] = 1
-    return np.array(mask, dtype=np.bool)
+    return np.array(mask, dtype=bool)
 
 def load_corpus_torch(dataset, device):
     """
@@ -88,7 +88,9 @@ def load_corpus_torch(dataset, device):
     val_mask = torch.tensor(val_mask, dtype=torch.float).to(device)
     test_mask = torch.tensor(test_mask, dtype=torch.float).to(device)
 
-    return adj, adj1, adj2, y_train, y_val, y_test, train_mask, val_mask, test_mask, train_size, val_size,test_size, num_labels
+    doc_indices = list(idx_train) + list(idx_val) + list(idx_test)
+
+    return adj, adj1, adj2, y_train, y_val, y_test, train_mask, val_mask, test_mask, train_size, val_size,test_size, num_labels, doc_indices
     
 def get_edge_tensor_list(adj_list, device):
     indice_list, data_list = [], []

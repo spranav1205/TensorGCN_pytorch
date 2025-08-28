@@ -1,0 +1,1 @@
+{"do_train": true, "do_valid": false, "do_test": false, "no_sparse": false, "load_ckpt": false, "featureless": false, "save_path": "./saved_model", "dataset": "mr", "model": "gcn", "lr": 0.0005, "epochs": 1000, "hidden": 200, "layers": 2, "dropout": 0.3, "weight_decay": 1.25e-05, "early_stop": 2000, "max_degree": 3, "mod_loss": true}

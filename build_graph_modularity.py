@@ -20,6 +20,8 @@ from torch.optim import AdamW
 from torch.utils.data import TensorDataset, RandomSampler, SequentialSampler, DataLoader
 import pickle as pkl
 import json
+from sentence_transformers import SentenceTransformer
+from sklearn.metrics.pairwise import cosine_similarity
 
 
 class LSTM_classifier(nn.Module):
@@ -54,8 +56,9 @@ def parse_args(args=None):
     parser.add_argument("--weight_decay", default=1e-6, type=float)
     parser.add_argument("--epochs", default=20, type=int)
     parser.add_argument("--seed", default=32, type=int)
-    parser.add_argument("--corenlp", default='./stanford-corenlp-4.5.10', type=str)
+    parser.add_argument("--corenlp", default='./stanfordcorenlp', type=str)
     parser.add_argument('--thres', default=0.05, type=float, help="the threshold of semantic graph")
+    parser.add_argument("--mod_loss", action='store_true')
     return parser.parse_args(args)
 
 def gen_syn(corpus, nlp:StanfordCoreNLP, row_tfidf, col_tfidf, weight_tfidf, word_id_map, node_size, train_size):
@@ -225,8 +228,6 @@ def train_lstm(corpus, word_id_map, train_size, valid_size, labels, emb_size, hi
 def gen_sem(args, corpus, word_id_map, row_tfidf, col_tfidf, weight_tfidf, thres, train_size, valid_size, labels, num_labels, node_size,device):
     t = time.time()
     model, all_outs, corpus_ids = train_lstm(corpus, word_id_map, train_size, valid_size, labels, args.embed_size, args.hidden_size, args.dropout, args.batch_size, args.epochs, args.lr, args.weight_decay, num_labels,device, args.max_len)
-    #TRAINS LSTM 
-    
     num_docs = all_outs.shape[0]
     test_ids = corpus_ids[train_size+valid_size:,:]
     cos_simi_count = {}
@@ -508,7 +509,7 @@ def gen_corpus(dataset):
 def main(args):
     # load stanfordcorenlp
     nlp = StanfordCoreNLP(args.corenlp, lang='en')
-    seed=148 #148
+    seed=148
     print(seed)
     random.seed(seed)
     np.random.seed(seed)
@@ -540,5 +541,16 @@ def main(args):
         f = open('./data/{}.sem_adj'.format(args.dataset), 'wb')
         pkl.dump(sem_adj, f)
         f.close()
+
+#This creates the modularity matrix and saves it as a file
+    if args.mod_loss:
+        print("Generating modularity matrix")
+        sbert_model = SentenceTransformer('all-mpnet-base-v2')
+        embeddings = sbert_model.encode(corpus, convert_to_tensor=True)
+        sim_matrix = cosine_similarity(embeddings.cpu().numpy())
+        f = open('./data/{}.modularity_adj'.format(args.dataset), 'wb')
+        pkl.dump(sim_matrix, f)
+        f.close()
+
 if __name__ == '__main__':
     main(parse_args())

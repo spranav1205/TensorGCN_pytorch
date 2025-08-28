@@ -1,9 +1,7 @@
 import torch
 import torch.nn as nn
 from torch_geometric.nn import GCNConv
-from torch_sparse import SparseTensor
-
-
+# from torch_sparse import SparseTensor
 
 
 class TGCN(nn.Module):
@@ -78,8 +76,11 @@ class GraphConv_fix(nn.Module):
         supports = []
         for i, conv in enumerate(self.intra_convs):
             # support = conv(inputs[i], edge_indexs[i], edge_weights[i])
-            adj = SparseTensor(row=edge_indexs[i][0], col=edge_indexs[i][1], value=edge_weights[i],
-                   sparse_sizes=(num_nodes, num_nodes))
+            adj = torch.sparse_coo_tensor(
+                indices=edge_indexs[i],
+                values=edge_weights[i],
+                size=(num_nodes, num_nodes)
+            )
             # support = conv(inputs[i], edge_indexs[i], edge_weights[i])
             support = conv(inputs[i], adj.t())
             support = self.act(support)
